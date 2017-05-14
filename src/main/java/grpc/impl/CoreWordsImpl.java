@@ -115,23 +115,46 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
     }
     return new ArrayList<>(titles);
   }
+
+  public void showLog(WordsRequest request, WordsReply reply) {
+    if (request == null) {
+      return;
+    }
+    for (Word word: request.getWordList()) {
+      logger.info("request : number -> " + word.getNumber() + ", text -> " + word.getText());
+    }
+    if (reply == null) {
+      return;
+    }
+    for (Result result : reply.getResultList()) {
+      String number = result.getNumber();
+      List<String> texts = new ArrayList<>();
+      int counter = result.getTextCount();
+      for (int i = 0; i < counter; i++) {
+        texts.add(result.getText(i));
+      }
+      logger.info("reply: number -> " + number + ", text -> " + texts);
+    }
+
+  }
+
   @Override
   public void extractorCoreWords(WordsRequest request, StreamObserver<WordsReply>
   responseObserver) {
     List<Word> words = request.getWordList();
     List<Result> results = new ArrayList<>();
-    logger.info("get request:" + words);
     for (Word word: words) {
       List<String> list = new ArrayList<>();
       String number = word.getNumber();
       String text = word.getText();
+      list.add(text);
       splitText(text, list);
       clearNoFormalText(list);
       List<String> titles = extractorCoreWords(list);
       results.add(Result.newBuilder().setNumber(number).addAllText(titles).build());
     }
     WordsReply reply = WordsReply.newBuilder().addAllResult(results).build();
-    logger.info("reply:" + reply);
+    showLog(request, reply);
     responseObserver.onNext(reply);
     responseObserver.onCompleted();
   }

@@ -17,6 +17,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import utils.FileContentUtil;
 
 /**
  * Created by Jerry on 2017/5/12.
@@ -101,7 +102,8 @@ public class CoreWordsClient {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  // read file content
+  public  void run() throws  Exception {
     CoreWordsClient coreWordsClient = new CoreWordsClient("localhost", 20299);
     String file = "/Users/devops/workspace/shell/jobtitle/JobTitle/position_dict.txt";
     List<String> originWords = new ArrayList<>();
@@ -118,7 +120,16 @@ public class CoreWordsClient {
       List extractors = coreWordsClient.doExtractor(words);
       result.add(word + "\t" + extractors.toString());
     }
-    // FileContentUtil.saveFile(fileSave, result);
+    FileContentUtil.saveFile(fileSave, result);
+  }
+  public static void main(String[] args) throws Exception {
+    CoreWordsClient coreWordsClient = new CoreWordsClient("localhost", 20299);
+    List<String> result = new ArrayList<>();
+    int i = 0;
+    List<Word> words = new ArrayList<>();
+    words.add(Word.newBuilder().setNumber(String.valueOf(i)).setText("分布式开发").build());
+    List extractors = coreWordsClient.doExtractor(words);
+
   }
 
 }

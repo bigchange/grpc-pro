@@ -6,6 +6,7 @@ import com.bgfurfeature.coreword.rpc.Word;
 import com.bgfurfeature.coreword.rpc.WordsReply;
 import com.bgfurfeature.coreword.rpc.WordsRequest;
 import com.hankcs.hanlp.HanLP;
+import com.hankcs.hanlp.seg.common.Term;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -99,18 +100,26 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
   private List<String> extractorCoreWords(List<String> doc) {
     Set<String> titles = new HashSet<>();
     for (String item : doc) {
+      logger.info("item -> " + item);
       titles.add(item);
+      List<Term> listTerm = HanLP.segment(item);
+      logger.info("term segment -> " + listTerm);
+      for (Term term: listTerm) {
+        titles.add(term.word);
+      }
       List<String> keyPhrases = getKeyPhrase(item, 2);
       List<String> keyWords = getKeyWords(item, 2);
       if (keyPhrases.size() > 0) {
         for (String keyItem : keyPhrases) {
           titles.add(keyItem);
         }
+        logger.info("key phrase -> " + keyPhrases);
       }
       if (keyWords.size() > 0) {
         for (String wordItem : keyWords) {
           titles.add(wordItem);
         }
+        logger.info("keyWords -> " + keyWords);
       }
     }
     return new ArrayList<>(titles);
@@ -147,7 +156,6 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
       List<String> list = new ArrayList<>();
       String number = word.getNumber();
       String text = word.getText();
-      list.add(text);
       splitText(text, list);
       clearNoFormalText(list);
       List<String> titles = extractorCoreWords(list);

@@ -5,8 +5,6 @@ import com.bgfurfeature.coreword.rpc.Result;
 import com.bgfurfeature.coreword.rpc.Word;
 import com.bgfurfeature.coreword.rpc.WordsReply;
 import com.bgfurfeature.coreword.rpc.WordsRequest;
-import com.hankcs.hanlp.HanLP;
-import com.hankcs.hanlp.seg.common.Term;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -14,12 +12,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import io.grpc.stub.StreamObserver;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import utils.FileContentUtil;
 
 /**
  * Created by Jerry on 2017/5/12.
@@ -28,53 +27,47 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
 
   private static Logger logger =  LoggerFactory.getLogger(CoreWordsImpl.class);
 
-  /**
-   * 去除非标准text
-   */
-  private void clearNoFormalText(List<String> list) {
-    List<String> needRemove = new ArrayList<>();
-    for (String item : list) {
-      if (item.contains("，") || item.contains("、") || item.contains(";") || item.contains("&") ||
-          item.contains("/") || item.contains(" ") || item.length() <= 1) {
-        needRemove.add(item);
-      }
-    }
-    list.removeAll(needRemove);
+  private List<String> classDict = new ArrayList<>();
+
+  private List<String> posDict = new ArrayList<>();
+
+  public CoreWordsImpl () {
+    FileContentUtil.readContents("/Users/devops/workspace/gitlab/idmg/resume_extractor/resources" +
+     "/job_mid_dic.txt", classDict);
+    FileContentUtil.readContents("/Users/devops/workspace/gitlab/idmg/resume_extractor/resources" +
+     "/job_last_dic.txt", posDict);
+    logger.info("class level size -> " + classDict.size() + ", pos dict size :" + posDict.size());
   }
 
-  private void splitText(String origin, List<String> list) {
-    // 将本身添加进去
-    list.add(origin);
-    if (origin.contains("/")) {
-      for (String item : origin.split("/")) {
-        list.add(item);
+  // 通过词表去除一些行业性质词： 最大匹配
+  private String findJobByDict(List<String> dict, String text) {
+    String maxMatch = "";
+    String minMath = "0xfffffffffffffffffffffff"; // 25 length
+    for (String dic: dict) {
+      if (text.contains(dic)) {
+        if (dic.length() > maxMatch.length()) {
+          maxMatch = dic;
+        } else if (dic.length() == maxMatch.length()) {
+          if (text.indexOf(dic) > text.indexOf(maxMatch)) {
+            maxMatch  = dic;
+          }
+        }
+        if (dic.length() <= minMath.length()) {
+          minMath = dic;
+        } else if (text.indexOf(dic) > text.indexOf(minMath)) {
+          minMath  = dic;
+        }
       }
     }
-    if (origin.contains(" ")) {
-      for (String item : origin.split(" ")) {
-        list.add(item);
-      }
+    logger.info("findJobByDict -> " + text + ", min match -> " + minMath + ", match max -> " + maxMatch);
+    if (maxMatch.isEmpty()) {
+      return "";
+    } else if (!maxMatch.isEmpty() && text.length() - maxMatch.length() >= 2) {
+      return maxMatch;
+    } else if (!minMath.isEmpty()) {
+      return minMath;
     }
-    if (origin.contains("&")) {
-      for (String item : origin.split("&")) {
-        list.add(item);
-      }
-    }
-    if (origin.contains(";")) {
-      for (String item : origin.split(";")) {
-        list.add(item);
-      }
-    }
-    if (origin.contains("、")) {
-      for (String item : origin.split("、")) {
-        list.add(item);
-      }
-    }
-    if (origin.contains("，")) {
-      for (String item : origin.split("，")) {
-        list.add(item);
-      }
-    }
+    return "";
   }
 
   public List<String> sortByValue(List<String> set) {
@@ -83,54 +76,17 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
     return set;
   }
 
-  public List<String> getKeyPhrase(String text, int size) {
-    List<String> keyWords = HanLP.extractPhrase(text, size);
-    clearNoFormalText(keyWords);
-    return keyWords;
-
-  }
-
-  public List<String> getKeyWords(String text, int size) {
-    List<String> keyWords = HanLP.extractKeyword(text, size);
-    clearNoFormalText(keyWords);
-    return keyWords;
-  }
-
-
-  private List<String> extractorCoreWords(List<String> doc) {
-    Set<String> titles = new HashSet<>();
-    for (String item : doc) {
-      logger.info("item -> " + item);
-      titles.add(item);
-      List<Term> listTerm = HanLP.segment(item);
-      logger.info("term segment -> " + listTerm);
-      for (Term term: listTerm) {
-        titles.add(term.word);
-      }
-      List<String> keyPhrases = getKeyPhrase(item, 2);
-      List<String> keyWords = getKeyWords(item, 2);
-      if (keyPhrases.size() > 0) {
-        for (String keyItem : keyPhrases) {
-          titles.add(keyItem);
-        }
-        logger.info("key phrase -> " + keyPhrases);
-      }
-      if (keyWords.size() > 0) {
-        for (String wordItem : keyWords) {
-          titles.add(wordItem);
-        }
-        logger.info("keyWords -> " + keyWords);
-      }
-    }
-    return new ArrayList<>(titles);
-  }
-
+  /**
+   * 显示日志
+   * @param request
+   * @param reply
+   */
   public void showLog(WordsRequest request, WordsReply reply) {
     if (request == null) {
       return;
     }
     for (Word word: request.getWordList()) {
-      logger.info("request : number -> " + word.getNumber() + ", text -> " + word.getText());
+      // logger.info("request : number -> " + word.getNumber() + ", text -> " + word.getText());
     }
     if (reply == null) {
       return;
@@ -153,16 +109,21 @@ public class CoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
     List<Word> words = request.getWordList();
     List<Result> results = new ArrayList<>();
     for (Word word: words) {
+      logger.info(" ----- ------  -----   ------- -----" );
       List<String> list = new ArrayList<>();
       String number = word.getNumber();
       String text = word.getText();
-      splitText(text, list);
-      clearNoFormalText(list);
-      List<String> titles = extractorCoreWords(list);
-      results.add(Result.newBuilder().setNumber(number).addAllText(titles).build());
+      String jobClass = findJobByDict(classDict, text);
+      String jobPos = findJobByDict(posDict, text);
+      String coreWord = text.replace(jobPos, "").replace(jobClass,"");
+      logger.info("joblevel is:" + jobClass + ", job pos is :" + jobPos + ", core word :" + coreWord);
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.put("origin", text).put("core", coreWord).put("level", jobClass).put("pos", jobPos);
+      String rText = jsonObject.toString();
+      results.add(Result.newBuilder().setNumber(number).addText(rText).build());
     }
     WordsReply reply = WordsReply.newBuilder().addAllResult(results).build();
-    showLog(request, reply);
+    // showLog(request, reply);
     responseObserver.onNext(reply);
     responseObserver.onCompleted();
   }

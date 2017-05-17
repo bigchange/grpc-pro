@@ -2,8 +2,7 @@ package grpc.serving;
 
 import java.io.IOException;
 
-import grpc.impl.CoreWordsImpl;
-import grpc.impl.GreeterImpl;
+import grpc.impl.JobTitleCoreWordsImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.vertx.core.logging.Logger;
@@ -14,10 +13,11 @@ import io.vertx.core.logging.LoggerFactory;
  */
 public class Serving {
 
-  private static Logger logger =  LoggerFactory.getLogger(Serving.class);
+  private static Logger logger = LoggerFactory.getLogger(Serving.class);
 
   private Server server;
   private int port = 20299;
+
   /**
    * Await termination on the main thread since the grpc library uses daemon threads.
    */
@@ -34,7 +34,7 @@ public class Serving {
   private void start() throws IOException {
     /* The port on which the server should run */
     server = ServerBuilder.forPort(port)
-        .addService(new CoreWordsImpl())
+        .addService(new JobTitleCoreWordsImpl()) // diff service pls new another service
         .build()
         .start();
     logger.info("Server started, listening on " + port);
@@ -49,7 +49,7 @@ public class Serving {
     });
   }
 
-  public static void main(String[] args) throws Exception{
+  public static void main(String[] args) throws Exception {
     Serving server = new Serving(20299);
     server.start();
     server.blockUntilShutdown();

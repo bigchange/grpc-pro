@@ -13,7 +13,7 @@ import io.vertx.core.logging.LoggerFactory;
  */
 public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
 
-  private static Logger logger =  LoggerFactory.getLogger(GreeterImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(GreeterImpl.class);
 
   @Override
   public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {

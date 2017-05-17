@@ -5,8 +5,6 @@ import com.bgfurfeature.coreword.rpc.Result;
 import com.bgfurfeature.coreword.rpc.Word;
 import com.bgfurfeature.coreword.rpc.WordsReply;
 import com.bgfurfeature.coreword.rpc.WordsRequest;
-import com.hankcs.hanlp.HanLP;
-import com.hankcs.hanlp.seg.common.Term;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,13 +28,13 @@ import utils.FileContentUtil;
 /**
  * Created by Jerry on 2017/5/12.
  */
-public class CoreWordsClient {
+public class JobTitleCoreWordsClient {
 
-  private static Logger logger = LoggerFactory.getLogger(CoreWordsClient.class);
+  private static Logger logger = LoggerFactory.getLogger(JobTitleCoreWordsClient.class);
   private final ManagedChannel channel;
   private final CoreWordsGrpc.CoreWordsBlockingStub blockingStub;
 
-  CoreWordsClient(ManagedChannelBuilder<?> channelBuilder) {
+  JobTitleCoreWordsClient(ManagedChannelBuilder<?> channelBuilder) {
     channel = channelBuilder.build();
     blockingStub = CoreWordsGrpc.newBlockingStub(channel);
   }
@@ -45,14 +43,12 @@ public class CoreWordsClient {
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
   }
 
-  public CoreWordsClient(String host, int port) {
+  public JobTitleCoreWordsClient(String host, int port) {
     this(ManagedChannelBuilder.forAddress(host, port).usePlaintext(true));
   }
 
   /**
    * grpc 请求
-   * @param words
-   * @return
    */
   private List<String> doExtractor(List<Word> words) {
     WordsRequest request = WordsRequest.newBuilder().addAllWord(words).build();
@@ -115,8 +111,10 @@ public class CoreWordsClient {
     }
   }
 
-  // read file content
-  public  void run() throws  Exception {
+  /**
+   * 文件内容批量处理
+   */
+  public void run() throws Exception {
     String file = "/Users/devops/workspace/shell/jobtitle/JobTitle/position_dict.txt";
     List<String> originWords = new ArrayList<>();
     String one = "position_dict.txt";
@@ -140,15 +138,10 @@ public class CoreWordsClient {
     Collections.sort(set, CHINA_COMPARE);
     return set;
   }
-  private List<String> extractorCoreWords(List<String> doc) {
-    Set<String> titles = new HashSet<>();
-    for (String item : doc) {
-      logger.info("item -> " + item);
-      titles.add(item);
-    }
-    return new ArrayList<>(titles);
-  }
 
+  /**
+   * 单元测试用例使用
+   */
   public void testUnit(List<String> originWords) {
     int i = 0;
     for (String word : originWords) {
@@ -164,9 +157,24 @@ public class CoreWordsClient {
 
 
   public static void main(String[] args) throws Exception {
-    CoreWordsClient coreWordsClient = new CoreWordsClient("localhost", 20299);
-    coreWordsClient.run();
-    // coreWordsClient.testUnit(Arrays.asList("java高级工程师"));
+    JobTitleCoreWordsClient coreWordsClient = new JobTitleCoreWordsClient("localhost", 20299);
+    // coreWordsClient.run();
+    coreWordsClient.testUnit(
+        Arrays.asList("java/c++开发软件工程师",
+            "校对/录入",
+            "信息管理部主管",
+            "技术总监/产品总监",
+            "首席信息官",
+            "商务经理商务专员",
+            "行政人事财务经理",
+            "高级经理",
+            "销售高级经理",
+            "中国区运营副总监",
+            "教育研究院院长",
+            "财经主持人",
+            "公共关系高级经理",
+            "销售部副主管"
+        ));
     // coreWordsClient.testUnit(Arrays.asList("商务总经理", "人力资源", "量化投资", "软件工程师"));
 
   }

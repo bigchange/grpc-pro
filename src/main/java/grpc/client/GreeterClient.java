@@ -37,8 +37,6 @@ public class GreeterClient {
 
   /**
    * sayHello
-   * @param message
-   * @return
    */
   public HelloReply greeter(String message) {
     HelloRequest request = HelloRequest.newBuilder().setName(message).build();
@@ -55,8 +53,6 @@ public class GreeterClient {
 
   /**
    * sayHelloAgain
-   * @param message
-   * @return
    */
   public HelloReply greeterAgain(String message) {
     HelloRequest request = HelloRequest.newBuilder().setName(message).build();
@@ -75,8 +71,8 @@ public class GreeterClient {
 
     GreeterClient client = new GreeterClient("localhost", 20299);
     try {
-     client.greeter("你好");
-     client.greeterAgain("i am grpc, thanks god it works!!");
+      client.greeter("你好");
+      client.greeterAgain("i am grpc, thanks god it works!!");
     } finally {
       client.shutdown();
     }

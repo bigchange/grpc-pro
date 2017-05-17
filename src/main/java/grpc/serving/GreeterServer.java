@@ -12,11 +12,12 @@ import io.vertx.core.logging.LoggerFactory;
  * Created by Jerry on 2017/5/10.
  * start a specific grpc service
  */
-public class GreeterServer  {
+public class GreeterServer {
 
-  private static Logger logger =  LoggerFactory.getLogger(GreeterServer.class);
+  private static Logger logger = LoggerFactory.getLogger(GreeterServer.class);
 
   private Server server;
+
   /**
    * Await termination on the main thread since the grpc library uses daemon threads.
    */
@@ -45,7 +46,7 @@ public class GreeterServer  {
     });
   }
 
-  public static void main(String[] args) throws Exception{
+  public static void main(String[] args) throws Exception {
     GreeterServer server = new GreeterServer();
     server.start();
     server.blockUntilShutdown();

@@ -9,6 +9,12 @@ import com.bgfurfeature.coreword.rpc.WordsRequest;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,14 +118,49 @@ public class JobTitleCoreWordsClient {
   }
 
   /**
+   * 遍历目录下的文件
+   */
+  public void readFiles(String dir, List<String> list) throws Exception {
+
+    Path path = Paths.get(dir);
+    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        String fileName = file.getFileName().toString();
+        String filePath = file.toString();
+        logger.info("visit file name is :" + fileName + ", path is:" + filePath);
+        try {
+          readContents(filePath, list);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        System.err.println("skipped:" + file);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+        if (e != null) {
+          System.err.println("found error after visit directory:" + e);
+        }
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
+
+  /**
    * 文件内容批量处理
    */
-  public void run() throws Exception {
-    String file = "/Users/devops/workspace/shell/jobtitle/JobTitle/position_dict.txt";
+  public void run(String previous) throws Exception {
+    String file = "/Users/devops/workspace/shell/jobtitle/JobTitle/" + previous;
     List<String> originWords = new ArrayList<>();
-    String one = "position_dict.txt";
-    String fileNormal = "/Users/devops/workspace/shell/jobtitle/normal_" + one;
-    readContents(file, originWords);
+    String fileNormal = "/Users/devops/workspace/shell/jobtitle/normal_" + previous;
+    readFiles(file, originWords);
     Set<String> normalResult = new HashSet<>();
     int i = 0;
     for (String word : originWords) {
@@ -142,7 +183,7 @@ public class JobTitleCoreWordsClient {
   /**
    * 单元测试用例使用
    */
-  public void testUnit(List<String> originWords) {
+  public List<String> testUnit(List<String> originWords, List<String> result) {
     int i = 0;
     for (String word : originWords) {
       List<Word> words = new ArrayList<>();
@@ -150,16 +191,20 @@ public class JobTitleCoreWordsClient {
       // increase number
       i++;
       List extractors = doExtractor(words);
+      result.addAll(extractors);
       logger.info("reply:" + extractors);
     }
+    return result;
 
   }
 
 
   public static void main(String[] args) throws Exception {
     JobTitleCoreWordsClient coreWordsClient = new JobTitleCoreWordsClient("localhost", 20299);
-    // coreWordsClient.run();
-    coreWordsClient.testUnit(
+
+    // coreWordsClient.run("src");
+
+    /*coreWordsClient.testUnit(
         Arrays.asList("java/c++开发软件工程师",
             "校对/录入",
             "信息管理部主管",
@@ -173,9 +218,10 @@ public class JobTitleCoreWordsClient {
             "教育研究院院长",
             "财经主持人",
             "公共关系高级经理",
-            "销售部副主管"
-        ));
-    // coreWordsClient.testUnit(Arrays.asList("商务总经理", "人力资源", "量化投资", "软件工程师"));
+            "销售部副主管",
+            "人力资源经理"
+        ), new ArrayList<String>());*/
+    coreWordsClient.testUnit(Arrays.asList("商务总经理", "人力资源", "量化投资", "软件工程师"), new ArrayList<>());
 
   }
 

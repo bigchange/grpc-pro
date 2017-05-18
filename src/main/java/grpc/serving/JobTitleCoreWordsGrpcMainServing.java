@@ -11,9 +11,9 @@ import io.vertx.core.logging.LoggerFactory;
 /**
  * Created by Jerry on 2017/5/12.
  */
-public class Serving {
+public class JobTitleCoreWordsGrpcMainServing {
 
-  private static Logger logger = LoggerFactory.getLogger(Serving.class);
+  private static Logger logger = LoggerFactory.getLogger(JobTitleCoreWordsGrpcMainServing.class);
 
   private Server server;
   private int port = 20299;
@@ -27,7 +27,7 @@ public class Serving {
     }
   }
 
-  public Serving(int port) {
+  public JobTitleCoreWordsGrpcMainServing(int port) {
     this.port = port;
   }
 
@@ -50,7 +50,7 @@ public class Serving {
   }
 
   public static void main(String[] args) throws Exception {
-    Serving server = new Serving(20299);
+    JobTitleCoreWordsGrpcMainServing server = new JobTitleCoreWordsGrpcMainServing(20299);
     server.start();
     server.blockUntilShutdown();
   }

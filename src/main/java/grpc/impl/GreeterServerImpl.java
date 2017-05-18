@@ -11,9 +11,9 @@ import io.vertx.core.logging.LoggerFactory;
  * Created by Jerry on 2017/5/10.
  * Greeter grpc service implement here
  */
-public class GreeterImpl extends GreeterGrpc.GreeterImplBase {
+public class GreeterServerImpl extends GreeterGrpc.GreeterImplBase {
 
-  private static Logger logger = LoggerFactory.getLogger(GreeterImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(GreeterServerImpl.class);
 
   @Override
   public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {

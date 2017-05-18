@@ -26,6 +26,18 @@ public class JobTitleCoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
 
   private static Logger logger = LoggerFactory.getLogger(JobTitleCoreWordsImpl.class);
 
+  private static List<String> splitList = new ArrayList<>();
+
+  static {
+    splitList.add("/");
+    splitList.add("兼");
+    splitList.add("和");
+    splitList.add("及");
+    splitList.add("且");
+    splitList.add("&");
+    splitList.add(" ");
+  }
+
   private List<String> classDict = new ArrayList<>();
 
   private List<String> posDict = new ArrayList<>();
@@ -71,34 +83,34 @@ public class JobTitleCoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
   }
 
   /**
-   * Each key value is JsonArray
-   * 先分隔 '/'后每个词在处理核心词
+   * 将请求的text文本，按一定的格式处理一下（'/'，'兼'，'及'，'和'等转换为'、'）
    */
-  public JsonObject formatText(String text) {
-    String[] formatTxt = text.split("/");
-    JsonArray levelArray = new JsonArray();
-    JsonArray coreArray = new JsonArray();
-    JsonArray posArray = new JsonArray();
-    JsonArray originArray = new JsonArray();
-    JsonObject jsonObject = new JsonObject();
-    for (String txt : formatTxt) {
-      originArray.add(txt);
-      String jobClass = findJobByDict(classDict, txt);
-      levelArray.add(jobClass);
-      String jobPos = findJobByDict(posDict, txt);
-      posArray.add(jobPos);
-      String coreWord = txt.replace(jobPos, "").replace(jobClass, "");
-      coreArray.add(coreWord);
-      jsonObject = new JsonObject();
-      jsonObject.put("origin", originArray).put("core", coreArray).put("level", levelArray)
-          .put("pos", posArray);
+  public String formatTxt(String text) {
+    String formatTxt = text;
+    for (String sp : splitList) {
+      if (formatTxt.contains(sp)) {
+        formatTxt = formatTxt.replace(sp, "、");
+      }
     }
-    return jsonObject;
+    return formatTxt;
   }
 
   /**
-   * 先处理核心词，存在分隔符 '/' 的核心词拆开
-   * 未处理可能存在的分隔符（'&' '、' ';'）
+   * Each key value is JsonArray
+   * 处理得到的核心词中存在 特殊分隔符的情况，需拆开
+   */
+  public void formatCoreWord(String coreWord, JsonArray coreArray) {
+
+    String[] formatTxt = coreWord.trim().split("、");
+    for (String txt : formatTxt) {
+      if (!"".equals(txt)) {
+        coreArray.add(txt);
+      }
+    }
+  }
+
+  /**
+   * 先处理核心词，存在分隔符 '、' 的核心词拆开
    */
   public JsonObject singleTest(String text) {
     JsonObject jsonObject = new JsonObject();
@@ -106,20 +118,22 @@ public class JobTitleCoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
     String coreWord = "";
     String jobClass = findJobByDict(classDict, text);
     String jobPos = findJobByDict(posDict, text);
-    // 技术总监/产品总监 - 优先选择level匹配到的（如果pos中有和level中相同部分）
-    if (!"".equals(jobClass) && jobPos.contains(jobClass) &&
-        jobPos.length() - jobClass.length() >= 2) {
-      coreWord = text.replace(jobClass, "");
-      jobPos = jobClass;
-    } else {
+    // 特殊情况的core 提取
+    if (!"".equals(jobPos) && jobPos.contains(jobClass)) {
+      String tempTxt = text.replace(jobPos, "").replace(jobClass, "");
+      if (tempTxt.length() >= 4) {
+        coreWord = text.replace(jobPos, "").replace(jobClass, "");
+      } else {
+        coreWord = text.replace(jobClass, "");
+      }
+    } else if (!"".equals(jobClass) && jobClass.length() > jobPos.length()) {
+      coreWord = text.replace(jobClass, "").replace(jobPos, "");
+    } else { // 默认都将职级，pos替换掉
       coreWord = text.replace(jobPos, "").replace(jobClass, "");
     }
-    String[] formatTxt = coreWord.trim().split("/");
-    for (String txt : formatTxt) {
-      if (!"".equals(txt)) {
-        coreArray.add(txt);
-      }
-    }
+    // 核心词格式处理
+    formatCoreWord(coreWord, coreArray);
+
     logger.info("joblevel is:" + jobClass + ", job pos is :" + jobPos + ", core word :" +
         coreArray);
     jsonObject.put("origin", text).put("core", coreArray).put("level", jobClass).put("pos", jobPos);
@@ -166,7 +180,9 @@ public class JobTitleCoreWordsImpl extends CoreWordsGrpc.CoreWordsImplBase {
       logger.info(" ----- ------  -----   ------- -----");
       String number = word.getNumber();
       String text = word.getText();
-      JsonObject jsonObject = singleTest(text);
+      // 职位格式处理
+      String formatTxt = formatTxt(text);
+      JsonObject jsonObject = singleTest(formatTxt);
       // JsonObject jsonObject = formatText(text);
       String rText = jsonObject.toString();
       results.add(Result.newBuilder().setNumber(number).addText(rText).build());

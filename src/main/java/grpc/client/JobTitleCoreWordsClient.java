@@ -192,7 +192,7 @@ public class JobTitleCoreWordsClient {
       i++;
       List extractors = doExtractor(words);
       result.addAll(extractors);
-      logger.info("reply:" + extractors);
+      // logger.info("reply:" + extractors);
     }
     return result;
 
@@ -204,8 +204,8 @@ public class JobTitleCoreWordsClient {
 
     // coreWordsClient.run("src");
 
-    /*coreWordsClient.testUnit(
-        Arrays.asList("java/c++开发软件工程师",
+    coreWordsClient.testUnit(
+        Arrays.asList("java/c++高级开发软件工程师",
             "校对/录入",
             "信息管理部主管",
             "技术总监/产品总监",
@@ -219,9 +219,16 @@ public class JobTitleCoreWordsClient {
             "财经主持人",
             "公共关系高级经理",
             "销售部副主管",
-            "人力资源经理"
-        ), new ArrayList<String>());*/
-    coreWordsClient.testUnit(Arrays.asList("商务总经理", "人力资源", "量化投资", "软件工程师"), new ArrayList<>());
+            "人力资源经理",
+            "经理及项目经理",
+            "技术总监/产品总监",
+            "董事长秘书兼助理",
+            "高级项目经理商务经理",
+            "高级项目/设计工程师",
+            "高级项目(商务)经理",
+            "风险管理部高级主任"
+        ), new ArrayList<>());
+     // coreWordsClient.testUnit(Arrays.asList("首席信息官"), new ArrayList<>());
 
   }
 

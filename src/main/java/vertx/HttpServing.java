@@ -20,13 +20,13 @@ import io.vertx.ext.web.handler.BodyHandler;
  * Created by Jerry on 2017/5/11.
  * http服务请求处理类
  */
-public class Serving {
+public class HttpServing {
 
   private final static Vertx vertx = Vertx.vertx();
 
   private  JobTitleCoreWordsClient coreWordsClient = new JobTitleCoreWordsClient("localhost", 20299);
 
-  private static Logger logger = LoggerFactory.getLogger(Serving.class);
+  private static Logger logger = LoggerFactory.getLogger(HttpServing.class);
 
   /**
    * indexing
@@ -98,10 +98,10 @@ public class Serving {
   }
 
   public static void main(String[] argv) throws IOException {
-    Serving serving = new Serving();
+    HttpServing serving = new HttpServing();
+    HttpServer server = vertx.createHttpServer();
     Router router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    HttpServer server = vertx.createHttpServer();
     serving.index(router);
     serving.getJsonJobTitleCores(router);
     int port = 8081;

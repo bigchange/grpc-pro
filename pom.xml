@@ -162,5 +162,12 @@
       <version>5.3.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/us.codecraft/webmagic-core -->
+    <dependency>
+      <groupId>us.codecraft</groupId>
+      <artifactId>webmagic-core</artifactId>
+      <version>0.6.1</version>
+    </dependency>
+
   </dependencies>
 </project>

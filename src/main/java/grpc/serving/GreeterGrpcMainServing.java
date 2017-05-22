@@ -29,7 +29,7 @@ public class GreeterGrpcMainServing {
 
   private void start() throws IOException {
     /* The port on which the server should run */
-    int port = 20299;
+    int port = 30299;
     server = ServerBuilder.forPort(port)
         .addService(new GreeterServerImpl())
         .build()

@@ -45,6 +45,7 @@ public class GreeterClient {
       reply = blockingStub.sayHello(request);
     } catch (Exception e) {
       logger.info(Level.WARNING, "RPC failed: {0}", e.getMessage());
+      logger.info(Level.WARNING  + "RPC failed -> " + e.getMessage());
       return null;
     }
     logger.info("Greeting: " + reply.getMessage());
@@ -69,10 +70,10 @@ public class GreeterClient {
 
   public static void main(String[] args) throws Exception {
 
-    GreeterClient client = new GreeterClient("localhost", 30299);
+    GreeterClient client = new GreeterClient("localhost", 30399);
     try {
       client.greeter("asp.net高级开发工程师");
-      // client.greeterAgain("i am grpc, thanks god it works!!");
+      client.greeterAgain("i am grpc, thanks god it works!!");
     } finally {
       client.shutdown();
     }

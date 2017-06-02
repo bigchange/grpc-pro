@@ -32,6 +32,22 @@ public class FileContentUtil {
 
   private static Logger logger = LoggerFactory.getLogger(FileContentUtil.class);
 
+
+  public static void readLines(List<String> termList, String path) throws Exception {
+    BufferedReader bf = null;
+    try {
+      bf = new BufferedReader(new FileReader(path));
+      String line = bf.readLine();
+      while (line != null) {
+        String[] lineSp = line.split("\t");
+        termList.add(lineSp[0]);
+        line = bf.readLine();
+      }
+    } finally {
+      bf.close();
+    }
+  }
+
   /**
    * 读取单个文件内容
    */

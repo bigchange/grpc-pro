@@ -5,4 +5,6 @@ package model;
  * tf-idf model for extracting job core words
  */
 public class TFIDFModel {
+
+
 }

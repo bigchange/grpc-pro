@@ -27,11 +27,11 @@ public class GreeterGrpcMainServing {
     }
   }
 
-  private void start() throws IOException {
+  private void start(String file) throws IOException {
     /* The port on which the server should run */
     int port = 30299;
     server = ServerBuilder.forPort(port)
-        .addService(new GreeterServerImpl())
+        .addService(new GreeterServerImpl(file))
         .build()
         .start();
     logger.info("Server started, listening on " + port);
@@ -47,8 +47,10 @@ public class GreeterGrpcMainServing {
   }
 
   public static void main(String[] args) throws Exception {
+
+    String filePath = "/Users/devops/workspace/shell/jd/result-map/part-00000";
     GreeterGrpcMainServing server = new GreeterGrpcMainServing();
-    server.start();
+    server.start(filePath);
     server.blockUntilShutdown();
   }
 }

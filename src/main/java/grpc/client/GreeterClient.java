@@ -70,9 +70,11 @@ public class GreeterClient {
 
   public static void main(String[] args) throws Exception {
 
-    GreeterClient client = new GreeterClient("localhost", 30399);
+    GreeterClient client = new GreeterClient("localhost", 30299);
     try {
-      client.greeter("asp.net高级开发工程师");
+      client.greeter("花艺工程师");
+      client.greeter("销售经理");
+      client.greeter("java工程师高级");
       client.greeterAgain("i am grpc, thanks god it works!!");
     } finally {
       client.shutdown();

@@ -1,4 +1,4 @@
-package vertx;
+package vertx.serving;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,13 +20,13 @@ import io.vertx.ext.web.handler.BodyHandler;
  * Created by Jerry on 2017/5/11.
  * http服务请求处理类
  */
-public class HttpServing {
+public class JobTitleHttpServing {
 
   private final static Vertx vertx = Vertx.vertx();
 
   private  JobTitleCoreWordsClient coreWordsClient = new JobTitleCoreWordsClient("localhost", 20299);
 
-  private static Logger logger = LoggerFactory.getLogger(HttpServing.class);
+  private static Logger logger = LoggerFactory.getLogger(JobTitleHttpServing.class);
 
   /**
    * indexing
@@ -98,7 +98,7 @@ public class HttpServing {
   }
 
   public static void main(String[] argv) throws IOException {
-    HttpServing serving = new HttpServing();
+    JobTitleHttpServing serving = new JobTitleHttpServing();
     HttpServer server = vertx.createHttpServer();
     Router router = Router.router(vertx);
     router.route().handler(BodyHandler.create());

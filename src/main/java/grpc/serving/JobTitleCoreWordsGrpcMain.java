@@ -2,21 +2,21 @@ package grpc.serving;
 
 import java.io.IOException;
 
-import grpc.impl.GreeterServerImpl;
+import grpc.impl.JobTitleCoreWordsImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 /**
- * Created by Jerry on 2017/5/10.
- * start a specific grpc service
+ * Created by Jerry on 2017/5/12.
  */
-public class GreeterGrpcMainServing {
+public class JobTitleCoreWordsGrpcMain {
 
-  private static Logger logger = LoggerFactory.getLogger(GreeterGrpcMainServing.class);
+  private static Logger logger = LoggerFactory.getLogger(JobTitleCoreWordsGrpcMain.class);
 
   private Server server;
+  private int port = 20299;
 
   /**
    * Await termination on the main thread since the grpc library uses daemon threads.
@@ -27,11 +27,14 @@ public class GreeterGrpcMainServing {
     }
   }
 
-  private void start(String file) throws IOException {
+  public JobTitleCoreWordsGrpcMain(int port) {
+    this.port = port;
+  }
+
+  private void start() throws IOException {
     /* The port on which the server should run */
-    int port = 30299;
     server = ServerBuilder.forPort(port)
-        .addService(new GreeterServerImpl(file))
+        .addService(new JobTitleCoreWordsImpl()) // diff service pls new another service
         .build()
         .start();
     logger.info("Server started, listening on " + port);
@@ -47,10 +50,8 @@ public class GreeterGrpcMainServing {
   }
 
   public static void main(String[] args) throws Exception {
-
-    String filePath = "/Users/devops/workspace/shell/jd/result-map/part-00000";
-    GreeterGrpcMainServing server = new GreeterGrpcMainServing();
-    server.start(filePath);
+    JobTitleCoreWordsGrpcMain server = new JobTitleCoreWordsGrpcMain(20299);
+    server.start();
     server.blockUntilShutdown();
   }
 }

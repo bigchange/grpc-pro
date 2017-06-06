@@ -1,0 +1,36 @@
+syntax = "proto3";
+package com.inmind.idmg.dedup.rpc;
+
+option java_multiple_files = true;
+
+service ResumeDedupService {
+    rpc doDedup(DedupRequest) returns (DedupReply) {
+    };
+}
+
+message Feature{
+  enum Type{
+    PHONE_AND_NAME=0;
+    EMAIL_AND_NAME=1;
+    PHONE_AND_COMPANY=2;
+    EMAIL_AND_COMPANY=3;
+    PHONE_AND_SCHOOL=4;
+    EMAIL_AND_SCHOOL=5;
+    NAME_AND_FIRST_WORK=6;
+    NAME_AND_FIRST_EDUCATION=7;
+    FIRST_WORK_AND_FIRST_EDUCATION=8;
+  }
+  Type type=1;
+  int64 value=2;
+}
+message DedupRequest{
+  // 所有的特征
+  repeated Feature features=1;
+  string docid=2;
+}
+
+message DedupReply{
+  bool is_dup=1;
+  int32 first_detected_by=2;
+  string dup_docid=3;
+}

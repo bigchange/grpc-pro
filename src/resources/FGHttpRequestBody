@@ -1,0 +1,15 @@
+## data format
+
+{"data":[{"phone":"18618251981","name":"闵令永","email":"191102988@qq.com","workExprs":[{"company":"","endedAt":"","startedAt":""}],"eduExprs":[{"school":"","startedAt":"","endedAt":"","major":""}],"number":"No.1"}]}
+
+## siege tool
+# --content-type "application/json" instead of -H "Content-Type:application/json"
+
+siege --content-type "application/json" -c 100 -r 20 http://127.0.0.1:20199/fingerprint POST
+{"data":[{"phone":"18618251981","name":"闵令永","email":"191102988@qq.com","workExprs":[{"company":"","endedAt":"","startedAt":""}],"eduExprs":[{"school":"","startedAt":"","endedAt":"","major":""}],"number":"No.1"}]}
+
+siege --content-type "application/json" -c 100 -r 20 http://127.0.0.1:20199/fingerprint POST data="{data:[{phone:18618251981,name:闵令永,email:191102988@qq.com,workExprs:[{company:,endedAt:,startedAt:}],eduExprs:[{school:,startedAt:,endedAt:,major:}],number:No.1}]}"
+
+## ab tool (worked)
+
+ab -n 5000 -c 10 -p ./data.json  -T 'application/json'  http://127.0.0.1:20199/fingerprint

@@ -39,7 +39,7 @@ public class GreeterServerImpl extends GreeterGrpc.GreeterImplBase {
 
     // simhash = new Simhash(4, 20);
 
-    model = new TFIDFImp(path);
+    // model = new TFIDFImp(path);
 
   }
 
@@ -47,15 +47,17 @@ public class GreeterServerImpl extends GreeterGrpc.GreeterImplBase {
 
   @Override
   public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
-    String respondMessage = "";
+    String respondMessage = "default";
     logger.info("message:" + request.getName());
     try {
+
       // simhash.calSimilarity(request.getName());
-      List<Map.Entry<Integer, Double>> list = model.getCosineSimilarity(request.getName(), 10);
+
+     /* List<Map.Entry<Integer, Double>> list = model.getCosineSimilarity(request.getName(), 10);
       logger.info("===top item ====");
       for (Map.Entry<Integer, Double> item: list) {
         logger.info("(" + item.getKey() + "," + item.getValue() + ",");
-      }
+      }*/
 
     } catch (Exception e) {
       e.printStackTrace();

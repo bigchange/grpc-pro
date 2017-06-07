@@ -5,8 +5,12 @@ import java.io.IOException;
 import grpc.impl.GreeterServerImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.ServerInterceptors;
+import io.prometheus.client.CollectorRegistry;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import me.dinowernli.grpc.prometheus.Configuration;
+import me.dinowernli.grpc.prometheus.MonitoringServerInterceptor;
 
 /**
  * Created by Jerry on 2017/5/10.
@@ -28,12 +32,28 @@ public class GreeterGrpcMain {
   }
 
   private void start(String file) throws IOException {
+
     /* The port on which the server should run */
+
     int port = 30299;
+
+    // add grpc monitor - not work  (io.netty.handler.codec.http2.Http2Exception:
+    // HTTP/2 client preface string missing or corrupt.
+    // Hex dump for received bytes: 1603010085010000810303871fcf0abeefc81a72f2ee73c6)
+
+    /*MonitoringServerInterceptor monitoringInterceptor =
+        MonitoringServerInterceptor.create(Configuration.cheapMetricsOnly().withCollectorRegistry
+        (new CollectorRegistry()));
     server = ServerBuilder.forPort(port)
+        .addService(ServerInterceptors.intercept((new GreeterServerImpl(file)), monitoringInterceptor))
+        .build()
+        .start();*/
+
+   server = ServerBuilder.forPort(port)
         .addService(new GreeterServerImpl(file))
         .build()
         .start();
+
     logger.info("Server started, listening on " + port);
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override

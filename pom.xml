@@ -15,11 +15,20 @@
   </properties>
 
   <repositories>
+
     <repository>
       <id>mvn</id>
       <name>Maven2 Repository</name>
       <url>http://central.maven.org/maven2</url>
     </repository>
+
+    <!-- GRC monitor tools -->
+    <repository>
+      <id>dinowernli-github-repo</id>
+      <name>third_party</name>
+      <url>https://raw.github.com/dinowernli/maven-repos/master</url>
+    </repository>
+
   </repositories>
 
   <build>
@@ -227,6 +236,17 @@
       <version>4.12</version>
     </dependency>
 
+    <dependency>
+      <groupId>me.dinowernli</groupId>
+      <artifactId>java-grpc-prometheus</artifactId>
+      <version>0.3.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.grpc</groupId>
+          <artifactId>grpc-all</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
   </dependencies>
 

@@ -224,6 +224,13 @@
       <version>1.21.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.google.api.grpc/grpc-monitoring-v3 -->
+    <dependency>
+      <groupId>com.google.api.grpc</groupId>
+      <artifactId>grpc-monitoring-v3</artifactId>
+      <version>0.0.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>

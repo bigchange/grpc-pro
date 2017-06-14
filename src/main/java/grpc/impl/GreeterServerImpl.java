@@ -8,11 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import io.grpc.stub.StreamObserver;
+import io.prometheus.client.Collector;
+import io.prometheus.client.CollectorRegistry;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import model.Simhash;
 import model.SuggesterText;
 import model.TFIDFImp;
+
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by Jerry on 2017/5/10.

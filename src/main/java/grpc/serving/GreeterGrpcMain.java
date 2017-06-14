@@ -41,18 +41,19 @@ public class GreeterGrpcMain {
     // HTTP/2 client preface string missing or corrupt.
     // Hex dump for received bytes: 1603010085010000810303871fcf0abeefc81a72f2ee73c6)
 
-    /*MonitoringServerInterceptor monitoringInterceptor =
+    MonitoringServerInterceptor monitoringInterceptor =
         MonitoringServerInterceptor.create(Configuration.cheapMetricsOnly().withCollectorRegistry
         (new CollectorRegistry()));
     server = ServerBuilder.forPort(port)
-        .addService(ServerInterceptors.intercept((new GreeterServerImpl(file)), monitoringInterceptor))
-        .build()
-        .start();*/
-
-   server = ServerBuilder.forPort(port)
-        .addService(new GreeterServerImpl(file))
+        .addService(ServerInterceptors.intercept((new GreeterServerImpl(file).bindService()),
+        monitoringInterceptor))
         .build()
         .start();
+
+   /*server = ServerBuilder.forPort(port)
+        .addService(new GreeterServerImpl(file))
+        .build()
+        .start();*/
 
     logger.info("Server started, listening on " + port);
     Runtime.getRuntime().addShutdownHook(new Thread() {

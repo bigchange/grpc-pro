@@ -1,0 +1,10 @@
+# website
+
+1.jouhui - http://www.jobui.com/
+  * website - 职友集
+  * jobtitle - // div[@class='work-list-box j-work-detail-list']/a/text()
+  * jobtupe  - //span[@class='job-type-title]/text()
+
+2. 智联招聘
+  * website - http://sou.zhaopin.com/
+  * jobtitle - //div[@id='search_right_demo']//div[class='clearfixed']/a/text()

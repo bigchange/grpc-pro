@@ -2,21 +2,22 @@ package grpc.serving;
 
 import java.io.IOException;
 
-import grpc.impl.GreeterImpl;
+import grpc.impl.JobTitleCoreWordsImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 /**
- * Created by Jerry on 2017/5/10.
- * start a specific grpc service
+ * Created by Jerry on 2017/5/12.
  */
-public class GreeterServer  {
+public class JobTitleCoreWordsGrpcMain {
 
-  private static Logger logger =  LoggerFactory.getLogger(GreeterServer.class);
+  private static Logger logger = LoggerFactory.getLogger(JobTitleCoreWordsGrpcMain.class);
 
   private Server server;
+  private int port = 20299;
+
   /**
    * Await termination on the main thread since the grpc library uses daemon threads.
    */
@@ -26,11 +27,14 @@ public class GreeterServer  {
     }
   }
 
+  public JobTitleCoreWordsGrpcMain(int port) {
+    this.port = port;
+  }
+
   private void start() throws IOException {
     /* The port on which the server should run */
-    int port = 20299;
     server = ServerBuilder.forPort(port)
-        .addService(new GreeterImpl())
+        .addService(new JobTitleCoreWordsImpl()) // diff service pls new another service
         .build()
         .start();
     logger.info("Server started, listening on " + port);
@@ -45,8 +49,8 @@ public class GreeterServer  {
     });
   }
 
-  public static void main(String[] args) throws Exception{
-    GreeterServer server = new GreeterServer();
+  public static void main(String[] args) throws Exception {
+    JobTitleCoreWordsGrpcMain server = new JobTitleCoreWordsGrpcMain(20299);
     server.start();
     server.blockUntilShutdown();
   }

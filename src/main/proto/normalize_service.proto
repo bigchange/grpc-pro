@@ -1,0 +1,66 @@
+syntax = "proto3";
+package com.inmind.idmg.text_sim.normalize.rpc;
+
+service NormalizeService {
+  // Normalize a single query.
+  rpc Normalize(NormRequest) returns (NormReply);
+  // TODO(Alan): Normalize a query batch.
+  rpc BatchNormalize(stream NormRequest) returns (stream NormReply);
+  // Identify a query.
+  rpc Identify(IdentifyRequest) returns (IdentifyReply);
+  // Identify a query batch.
+  rpc BatchIdentify(stream IdentifyRequest) returns (stream IdentifyReply);
+}
+
+enum NormType {
+  UNKNOWN_TYPE = 0;
+  SIMPLE = 1;
+  RULE = 2;
+}
+
+enum NormalSource {
+  UNKNOWN_SOURCE = 0;
+  QICHACHA = 1;
+  SHUIDI = 2;
+}
+
+message Normee {
+  int32 id = 1;
+  string text = 2;
+  NormalSource src = 3;
+}
+
+message NormRequest {
+  repeated Normee query = 1;
+  // If queries have the same key, they are considered
+  // to make up a cell.
+  bool is_cell = 2;
+  NormType norm_type = 3;
+  int32 ver = 4;
+}
+
+message NormReply {
+  repeated Normee suggest = 1;
+}
+
+message OrgLocNameIndKey {
+  string loc = 1;
+  string name = 2;
+  string ind = 3;
+  string form = 4;
+}
+
+message OrgHierarchyKey {
+  repeated OrgLocNameIndKey primary = 1;
+  repeated OrgLocNameIndKey vice = 2;
+}
+
+message IdentifyRequest {
+  string query = 1;
+  int32 ver = 2;
+}
+
+message IdentifyReply {
+  bool is_company=1;
+  OrgHierarchyKey key = 2;
+}

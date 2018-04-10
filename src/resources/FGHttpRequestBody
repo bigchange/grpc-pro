@@ -1,0 +1,76 @@
+## data format
+
+{"data":[{"phone":"18618251981","name":"闵令永","email":"191102988@qq.com","workExprs":[{"company":"","endedAt":"","startedAt":""}],"eduExprs":[{"school":"","startedAt":"","endedAt":"","major":""}],"number":"No.1"}]}
+
+## siege tool
+# --content-type "application/json" instead of -H "Content-Type:application/json"
+
+siege --content-type "application/json" -c 100 -r 20 http://127.0.0.1:20199/fingerprint POST
+{"data":[{"phone":"18618251981","name":"闵令永","email":"191102988@qq.com","workExprs":[{"company":"","endedAt":"","startedAt":""}],"eduExprs":[{"school":"","startedAt":"","endedAt":"","major":""}],"number":"No.1"}]}
+
+siege --content-type "application/json" -c 100 -r 20 http://127.0.0.1:20199/fingerprint POST data="{data:[{phone:18618251981,name:闵令永,email:191102988@qq.com,workExprs:[{company:,endedAt:,startedAt:}],eduExprs:[{school:,startedAt:,endedAt:,major:}],number:No.1}]}"
+
+## ab tool (worked)
+
+ab -n 5000 -c 10 -p ./data.json  -T 'application/json'  http://127.0.0.1:20199/fingerprint
+
+==== response ====
+
+command: ab -n 500000 -c 100 -p ./data.json  -T 'application/json'  http://127.0.0.1:20199/fingerprint
+
+This is ApacheBench, Version 2.3 <$Revision: 1757674 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 50000 requests
+Completed 100000 requests
+Completed 150000 requests
+Completed 200000 requests
+Completed 250000 requests
+Completed 300000 requests
+Completed 350000 requests
+Completed 400000 requests
+Completed 450000 requests
+Completed 500000 requests
+Finished 500000 requests
+
+
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            20199
+
+Document Path:          /fingerprint
+Document Length:        274 bytes
+
+Concurrency Level:      100
+Time taken for tests:   5942.755 seconds
+Complete requests:      500000
+Failed requests:        0
+Total transferred:      180500000 bytes
+Total body sent:        184000000
+HTML transferred:       137000000 bytes
+Requests per second:    84.14 [#/sec] (mean)
+Time per request:       1188.551 [ms] (mean)
+Time per request:       11.886 [ms] (mean, across all concurrent requests)
+Transfer rate:          29.66 [Kbytes/sec] received
+                        30.24 kb/s sent
+                        59.90 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0      96
+Processing:    65 1188 2640.1    521   40315
+Waiting:       65 1188 2640.1    521   40315
+Total:         68 1188 2640.1    522   40315
+
+Percentage of the requests served within a certain time (ms)
+  50%    522
+  66%    601
+  75%    726
+  80%    907
+  90%   1770
+  95%   4653
+  98%  10225
+  99%  14768
+ 100%  40315 (longest request)

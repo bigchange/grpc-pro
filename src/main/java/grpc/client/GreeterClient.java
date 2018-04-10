@@ -37,8 +37,6 @@ public class GreeterClient {
 
   /**
    * sayHello
-   * @param message
-   * @return
    */
   public HelloReply greeter(String message) {
     HelloRequest request = HelloRequest.newBuilder().setName(message).build();
@@ -47,6 +45,7 @@ public class GreeterClient {
       reply = blockingStub.sayHello(request);
     } catch (Exception e) {
       logger.info(Level.WARNING, "RPC failed: {0}", e.getMessage());
+      logger.info(Level.WARNING  + "RPC failed -> " + e.getMessage());
       return null;
     }
     logger.info("Greeting: " + reply.getMessage());
@@ -55,8 +54,6 @@ public class GreeterClient {
 
   /**
    * sayHelloAgain
-   * @param message
-   * @return
    */
   public HelloReply greeterAgain(String message) {
     HelloRequest request = HelloRequest.newBuilder().setName(message).build();
@@ -73,10 +70,12 @@ public class GreeterClient {
 
   public static void main(String[] args) throws Exception {
 
-    GreeterClient client = new GreeterClient("localhost", 20299);
+    GreeterClient client = new GreeterClient("localhost", 30299);
     try {
-     client.greeter("你好");
-     client.greeterAgain("i am grpc, thanks god it works!!");
+      client.greeter("花艺工程师");
+      client.greeter("销售经理");
+      client.greeter("java工程师高级");
+      client.greeterAgain("i am grpc, thanks god it works!!");
     } finally {
       client.shutdown();
     }
